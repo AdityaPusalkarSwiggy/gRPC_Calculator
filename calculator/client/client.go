@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/sagar23sj/go-grpc/greet/greetpb"
+	"github.com/AdityaPusalkarSwiggy/gRPC_Calculator/calculator/calcpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -15,39 +15,33 @@ import (
 
 func main() {
 
-	cc, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	cc, err := grpc.Dial("localhost:50505", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("could not connect: %v", err)
 	}
 	defer cc.Close()
 
-	c := greetpb.NewGreetServiceClient(cc)
+	c := calcpb.NewCalculatorServiceClient(cc)
 
-	//Unary API function - Greet
-	// Greet(c)
+	// Unary function - Sum
+	Sum(c)
 
-	// Server-Side Streaming function - GreetManyTimes
-	// GreetManyTimes(c)
+	// Server-Side Streaming function - Prime
+	Prime(c)
 
-	//Client-Side Straming function - LongGreet
-	// LongGreet(c)
+	// Client-Side Streaming function - Average
+	Average(c)
 
-	//bidirectional streaming function - GreetEveryone
-	// GreetEveryone(c)
-
-	//unary API with Deadline
-	// GreetWithDeadline(c)
-
-	//unary API with Error Handling
-	GreetWithErrorHandling(c)
+	// Bi-Directional Streaming function - Max
+	Max(c)
 }
 
-func Greet(c greetpb.GreetServiceClient) {
+func Greet(c calcpb.CalculatorServiceClient) {
 
 	fmt.Println("Starting to do a unary GRPC....")
 
-	req := greetpb.GreetRequest{
-		Greeting: &greetpb.Greeting{
+	req := calcpb.GreetRequest{
+		Number: &calcpb.Number{
 			FirstName: "John",
 			LastName:  "Doe",
 		},
@@ -62,12 +56,12 @@ func Greet(c greetpb.GreetServiceClient) {
 
 }
 
-func GreetManyTimes(c greetpb.GreetServiceClient) {
+func GreetManyTimes(c calcpb.CalculatorServiceClient) {
 	fmt.Println("Staring ServerSide GRPC streaming ....")
 
-	req := greetpb.GreetManyTimesRequest{
+	req := calcpb.GreetManyTimesRequest{
 
-		Greeting: &greetpb.Greeting{
+		Number: &calcpb.Number{
 			FirstName: "Michael",
 			LastName:  "Jackson",
 		},
@@ -93,42 +87,41 @@ func GreetManyTimes(c greetpb.GreetServiceClient) {
 	}
 }
 
-func LongGreet(c greetpb.GreetServiceClient) {
+func Average(c calcpb.CalculatorServiceClient) {
 
 	fmt.Println("Starting Client Side Streaming over GRPC ....")
 
-	stream, err := c.LongGreet(context.Background())
+	stream, err := c.Average(context.Background())
 	if err != nil {
 		log.Fatalf("error occured while performing client-side streaming : %v", err)
 	}
 
-	requests := []*greetpb.LongGreetRequest{
-		&greetpb.LongGreetRequest{
-			Greeting: &greetpb.Greeting{
+	requests := []*calcpb.AverageRequest{
+		&calcpb.AverageRequest{
+			Number: &calcpb.Number{
 				FirstName: "James",
 				LastName:  "Bond",
 			},
 		},
-		&greetpb.LongGreetRequest{
-			Greeting: &greetpb.Greeting{
-				FirstName: "Tim",
-				LastName:  "Cook",
+		&calcpb.AverageRequest{
+			Number: &calcpb.Number{
+				Num: 5,
 			},
 		},
-		&greetpb.LongGreetRequest{
-			Greeting: &greetpb.Greeting{
+		&calcpb.AverageRequest{
+			Number: &calcpb.Number{
 				FirstName: "Elon",
 				LastName:  "Musk",
 			},
 		},
-		&greetpb.LongGreetRequest{
-			Greeting: &greetpb.Greeting{
+		&calcpb.AverageRequest{
+			Number: &calcpb.Number{
 				FirstName: "Sam",
 				LastName:  "Rutherford",
 			},
 		},
-		&greetpb.LongGreetRequest{
-			Greeting: &greetpb.Greeting{
+		&calcpb.AverageRequest{
+			Number: &calcpb.Number{
 				FirstName: "Eoin",
 				LastName:  "Morgan",
 			},
@@ -148,36 +141,36 @@ func LongGreet(c greetpb.GreetServiceClient) {
 	fmt.Println("\n****Response From Server : ", resp.GetResult())
 }
 
-func GreetEveryone(c greetpb.GreetServiceClient) {
+func GreetEveryone(c calcpb.CalculatorServiceClient) {
 	fmt.Println("Starting Bi-directional stream by calling GreetEveryone over GRPC......")
 
-	requests := []*greetpb.GreetEveryoneRequest{
-		&greetpb.GreetEveryoneRequest{
-			Greeting: &greetpb.Greeting{
+	requests := []*calcpb.GreetEveryoneRequest{
+		&calcpb.GreetEveryoneRequest{
+			Number: &calcpb.Number{
 				FirstName: "James",
 				LastName:  "Bond",
 			},
 		},
-		&greetpb.GreetEveryoneRequest{
-			Greeting: &greetpb.Greeting{
+		&calcpb.GreetEveryoneRequest{
+			Number: &calcpb.Number{
 				FirstName: "Harry",
 				LastName:  "Mitchel",
 			},
 		},
-		&greetpb.GreetEveryoneRequest{
-			Greeting: &greetpb.Greeting{
+		&calcpb.GreetEveryoneRequest{
+			Number: &calcpb.Number{
 				FirstName: "Tim",
 				LastName:  "Cook",
 			},
 		},
-		&greetpb.GreetEveryoneRequest{
-			Greeting: &greetpb.Greeting{
+		&calcpb.GreetEveryoneRequest{
+			Number: &calcpb.Number{
 				FirstName: "Sam",
 				LastName:  "Rutherford",
 			},
 		},
-		&greetpb.GreetEveryoneRequest{
-			Greeting: &greetpb.Greeting{
+		&calcpb.GreetEveryoneRequest{
+			Number: &calcpb.Number{
 				FirstName: "Eoin",
 				LastName:  "Morgan",
 			},
@@ -192,10 +185,10 @@ func GreetEveryone(c greetpb.GreetServiceClient) {
 	//wait channel to block receiver
 	waitchan := make(chan struct{})
 
-	go func(requests []*greetpb.GreetEveryoneRequest) {
+	go func(requests []*calcpb.GreetEveryoneRequest) {
 		for _, req := range requests {
 
-			fmt.Println("\nSending Request..... : ", req.Greeting)
+			fmt.Println("\nSending Request..... : ", req.Number)
 			err := stream.Send(req)
 			if err != nil {
 				log.Fatalf("error while sending request to GreetEveryone service : %v", err)
@@ -224,83 +217,4 @@ func GreetEveryone(c greetpb.GreetServiceClient) {
 
 	//block until everything is finished
 	<-waitchan
-}
-
-func GreetWithDeadline(c greetpb.GreetServiceClient) {
-	fmt.Println("\nStarting unary streaming with deadline .......")
-
-	// doGreetWithDeadline(c, 5*time.Second)
-
-	doGreetWithDeadline(c, 2*time.Second)
-}
-
-func doGreetWithDeadline(c greetpb.GreetServiceClient, timeout time.Duration) {
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	fmt.Printf("Staring to do a unary streaming with deadline of : %v", timeout)
-
-	request := &greetpb.GreetWithDeadlineRequest{
-		Greeting: &greetpb.Greeting{
-			FirstName: "John",
-			LastName:  "Doe",
-		},
-	}
-
-	resp, err := c.GreetWithDeadline(ctx, request)
-	if err != nil {
-
-		statusErr, ok := status.FromError(err)
-
-		fmt.Printf("\nError code : %v", statusErr.Code())
-		fmt.Printf("\nError Message : %v", statusErr.Message())
-		if ok {
-			if statusErr.Code() == codes.DeadlineExceeded {
-				fmt.Println("\nOperation cannnot proceed further, Deadline Exceeded")
-				return
-			} else {
-				log.Fatalf("unexpected error occured : %v", statusErr)
-				return
-			}
-		} else {
-
-			log.Fatalf("error occured while calling GreetWithDeadline on Server : %v", err)
-			return
-		}
-	}
-
-	fmt.Println("\nResponse From server : ", resp.GetResult())
-}
-
-func GreetWithErrorHandling(c greetpb.GreetServiceClient) {
-
-	fmt.Println("Starting to do a unary GRPC with Error Handling....")
-
-	req := greetpb.GreetWithErrorHandlingRequest{
-		Greeting: &greetpb.Greeting{
-			FirstName: "John",
-			LastName:  "John",
-		},
-	}
-
-	resp, err := c.GreetWithErrorHandling(context.Background(), &req)
-	if err != nil {
-		respErr, ok := status.FromError(err)
-		if ok {
-			//actual error from GRPC (user error)
-			fmt.Println("\nError Message : ", respErr.Message())
-			fmt.Println("\nError Code : ", respErr.Code())
-
-			if respErr.Code() == codes.InvalidArgument {
-				fmt.Println("Probably sent same first name and last name!")
-				return
-			}
-		} else {
-			log.Fatalf("error calling GreetWithErrorHandling : %v", err)
-			return
-		}
-	}
-
-	log.Printf("Response from Greet Unary Call with Error Handling : %v", resp.Result)
 }
